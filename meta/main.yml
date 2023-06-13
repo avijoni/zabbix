@@ -1,9 +1,9 @@
 ---
 galaxy_info:
-  author: Lovro Pozarnik, Ziga Zvan
-  company: Cetrta Pot d.o.o.
+  author: Dušan Milovanović
+  company: none
   description: Ansible role for install Zabbix agent
-  license: none
+  license: GPL 2.0
   min_ansible_version: unknown
   platforms:
     - name: Fedora
