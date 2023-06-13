@@ -33,7 +33,7 @@
       replace:
         path: /etc/zabbix/zabbix_agent2.conf
         regexp: "^Server=.*"
-        replace: "Server=172.31.64.7"
+        replace: "Server=zabbix.dev.loc"
     - name: Add Zabbix hostname
       replace:
         path: /etc/zabbix/zabbix_agent2.conf
@@ -43,7 +43,7 @@
       replace:
         path: /etc/zabbix/zabbix_agent2.conf
         regexp: "^ServerActive=.*"
-        replace: "ServerActive=172.31.64.7"
+        replace: "ServerActive=zabbix.dev.loc"
     - name: Add HostMetadata info for auto registration
       replace:
         path: /etc/zabbix/zabbix_agent2.conf
