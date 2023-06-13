@@ -1,0 +1,108 @@
+---
+- name: Remove old Zabbix package
+  yum:
+    state: absent
+    name: "zabbix-agent"
+
+##########################################################
+#                  OS version 6                          #
+##########################################################
+
+- name: Install Zabbix for CentOS/OracleLinux/RHEL 6
+  block:
+    - name: Install libselinux-python
+      yum:
+        state: present
+        name: "libselinux-python"
+
+    - name: Add Zabbix repository on rhel ver 6
+      yum_repository:
+        name: Zabbix
+        description: Zabbix YUM repo
+        baseurl: "{{ zabbix_centos6_url }}"
+
+    - name: Install Zabbix agent 2 on rhel ver 6
+      yum:
+        name: zabbix-agent2
+        validate_certs: false
+        update_cache: true
+        state: latest
+
+    - name: Configure firewall for Zabbix 2 on rhel ver 6
+      ansible.builtin.iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: 10050
+        jump: ACCEPT
+  when:
+    - ansible_distribution_major_version == "6"
+
+#################################################################
+#                     OS version 7                              #
+#################################################################
+
+- name: Install Zabbix for CentOS/OracleLinux/RHEL 7
+  block:
+    - name: Add Zabbix repository on rhel ver 7
+      yum_repository:
+        name: Zabbix
+        description: Zabbix YUM repo
+        baseurl: "{{ zabbix_centos7_url }}"
+
+    - name: Install Zabbix agent 2 on rhel ver 7
+      yum:
+        name: zabbix-agent2
+        validate_certs: false
+        update_cache: true
+        state: latest
+
+    - name: Check status of firewalld service
+      ansible.builtin.systemd:
+        name: firewalld
+      register: firewalld_service_status
+
+    - name: Configure firewall for Zabbix 2 on rhel ver 7
+      ansible.posix.firewalld:
+        port: 10050/tcp
+        permanent: true
+        state: enabled
+        immediate: true
+        offline: false
+      when: firewalld_service_status.status.ActiveState == "active"
+  when:
+    - ansible_distribution_major_version == "7"
+
+###################################################################
+#                     OS  version 8                               #
+###################################################################
+
+- name: Install Zabbix for CentOS/OracleLinux/RHEL 8
+  block:
+    - name: Add Zabbix repository on rhel ver 8
+      yum_repository:
+        name: Zabbix
+        description: Zabbix YUM repo
+        baseurl: "{{ zabbix_centos8_url }}"
+
+    - name: Install Zabbix-agent2 on rhel ver 8
+      dnf:
+        name: "zabbix-agent2"
+        update_cache: true
+        state: latest
+        allow_downgrade: true
+
+    - name: Check status of firewalld service
+      ansible.builtin.systemd:
+        name: firewalld
+      register: firewalld_service_status
+
+    - name: Configure firewall for Zabbix 2 on rhel ver 7
+      ansible.posix.firewalld:
+        port: 10050/tcp
+        permanent: true
+        state: enabled
+        immediate: true
+        offline: false
+      when: firewalld_service_status.status.ActiveState == "active"
+  when:
+    - ansible_distribution_major_version == "8"

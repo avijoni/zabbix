@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Lovro Pozarnik, Ziga Zvan
+  company: Cetrta Pot d.o.o.
+  description: Ansible role for install Zabbix agent
+  license: none
+  min_ansible_version: unknown
+  platforms:
+    - name: Fedora
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all

@@ -1,0 +1,58 @@
+---
+- name: Import a GPG key for zabbix repo
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://repo.zabbix.com/zabbix-official-repo.key
+  when:
+    - ansible_distribution == 'CentOS' or
+      ansible_distribution == 'Red Hat Enterprise Linux' or
+      ansible_distribution == 'OracleLinux'
+
+- name: Import a GPG key for zabbix repo
+  ansible.builtin.apt_key:
+    state: present
+    url: https://repo.zabbix.com/zabbix-official-repo.key
+  when:
+    - ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+- name: Include CentosRhel
+  include_tasks: CentosRhel.yml
+  when:
+    - ansible_distribution == 'CentOS' or
+      ansible_distribution == 'Red Hat Enterprise Linux' or
+      ansible_distribution == 'OracleLinux'
+
+- name: Include UbuntuDebian
+  include_tasks: UbuntuDebian.yml
+  when:
+    - ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+- name: Update Zabbix 2 agent conf file
+  block:
+    - name: Add Zabbix server IP
+      replace:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: "^Server=.*"
+        replace: "Server=172.31.64.7"
+    - name: Add Zabbix hostname
+      replace:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: "^Hostname=.*"
+        replace: "Hostname={{ ansible_hostname }}"
+    - name: Add Zabbix ServerActive IP
+      replace:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: "^ServerActive=.*"
+        replace: "ServerActive=172.31.64.7"
+    - name: Add HostMetadata info for auto registration
+      replace:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: "^.*HostMetadata=.*"
+        replace: "HostMetadata=Linux
+                 fdgdfslgkjsdflg45894598hg5gn5439845t45fn4893jrfjn"
+
+- name: Restart and enable Zabbix 2 service
+  service:
+    name: zabbix-agent2
+    state: restarted
+    enabled: true

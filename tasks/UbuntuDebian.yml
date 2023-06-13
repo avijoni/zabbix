@@ -1,0 +1,37 @@
+---
+- name: Install Zabbix for Ubuntu
+  block:
+    - name: Remove old Zabbix package on Ubuntu
+      apt:
+        state: absent
+        name: "zabbix-agent"
+
+    - name: Add zabbix repo on Ubuntu with major version lower than 22
+      apt_repository:
+        repo: "deb {{ zabbix_ubuntu_url }}
+              {{ ansible_distribution_release }} main"
+        filename: "zabbix"
+        state: present
+      when:
+        - ansible_distribution_major_version < "22"
+
+    - name: Add zabbix repo on Ubuntu with major version 22 or higher
+      apt_repository:
+        repo: "deb {{ zabbix_6_ubuntu_url }}
+              {{ ansible_distribution_release }} main"
+        filename: "zabbix"
+        state: present
+      when:
+        - ansible_distribution_major_version >= "22"
+
+    - name: Install the Zabbix 2 .deb package  on Ubuntu
+      apt:
+        pkg: zabbix-agent2
+        state: present
+
+    - name: Configure firewall for Zabbix 2  on Ubuntu
+      community.general.ufw:
+        rule: allow
+        port: "10050"
+        proto: tcp
+        state: reloaded
